@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Solster.Aspire.Azure.CommunicationServices/src/Solster.Aspire.Azure.CommunicationServices.csproj" />
+    <Project Path="src/Solster.Aspire.Azure.FrontDoor/src/Solster.Aspire.Azure.FrontDoor.csproj" />
+    <Project Path="src/Solster.Aspire.Hosting.Azure.CommunicationServices/src/Solster.Aspire.Hosting.Azure.CommunicationServices.csproj" />
+    <Project Path="src/Solster.Aspire.Hosting.Azure.FrontDoor/src/Solster.Aspire.Hosting.Azure.FrontDoor.csproj" />
+  </Folder>
+</Solution>
