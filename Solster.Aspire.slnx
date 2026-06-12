@@ -4,5 +4,9 @@
     <Project Path="src/Solster.Aspire.Azure.FrontDoor/src/Solster.Aspire.Azure.FrontDoor.csproj" />
     <Project Path="src/Solster.Aspire.Hosting.Azure.CommunicationServices/src/Solster.Aspire.Hosting.Azure.CommunicationServices.csproj" />
     <Project Path="src/Solster.Aspire.Hosting.Azure.FrontDoor/src/Solster.Aspire.Hosting.Azure.FrontDoor.csproj" />
+    <Project Path="src/Solster.Aspire.Hosting.Azure.PostgreSQL/src/Solster.Aspire.Hosting.Azure.PostgreSQL.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Solster.Aspire.Hosting.Azure.PostgreSQL.Tests/Solster.Aspire.Hosting.Azure.PostgreSQL.Tests.csproj" />
   </Folder>
 </Solution>

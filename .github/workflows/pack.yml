@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Package version. Defaults to 0.1.0-preview.<run-number>.
+        description: Package version. Defaults to 0.1.0-preview.<UTC timestamp>.
         required: false
         type: string
 
@@ -35,17 +35,22 @@ jobs:
         id: version
         shell: bash
         run: |
+          timestamp="$(date -u +'%Y%m%d%H%M%S')"
+
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            echo "package_version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            package_version="${GITHUB_REF_NAME#v}"
           elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             if [[ -n "${{ inputs.version }}" ]]; then
-              echo "package_version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+              package_version="${{ inputs.version }}"
             else
-              echo "package_version=0.1.0-preview.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+              package_version="0.1.0-preview.${timestamp}"
             fi
           else
-            echo "package_version=0.1.0-ci.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+            package_version="0.1.0-preview.${timestamp}"
           fi
+
+          echo "Package version: ${package_version}"
+          echo "version=${package_version}" >> "$GITHUB_OUTPUT"
 
       - name: Restore
         run: dotnet restore Solster.Aspire.slnx
@@ -54,7 +59,30 @@ jobs:
         run: dotnet build Solster.Aspire.slnx --configuration Release --no-restore
 
       - name: Pack
-        run: dotnet pack Solster.Aspire.slnx --configuration Release --no-build --output artifacts/packages /p:PackageVersion=${{ steps.version.outputs.package_version }}
+        shell: bash
+        run: |
+          mapfile -t projects < <(find ./src -name '*.csproj' | sort)
+          if [[ ${#projects[@]} -eq 0 ]]; then
+            echo "No projects found under ./src" >&2
+            exit 1
+          fi
+
+          packable_projects=()
+          for project in "${projects[@]}"; do
+            is_packable="$(dotnet msbuild "${project}" -nologo -getProperty:IsPackable | tr -d '\r')"
+            if [[ "${is_packable}" == "true" ]]; then
+              packable_projects+=("${project}")
+            fi
+          done
+
+          if [[ ${#packable_projects[@]} -eq 0 ]]; then
+            echo "No packable projects found (IsPackable=true)." >&2
+            exit 1
+          fi
+
+          for project in "${packable_projects[@]}"; do
+            dotnet pack "${project}" --no-restore --configuration Release --output ./artifacts/packages -p:Version=${{ steps.version.outputs.version }}
+          done
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
@@ -63,5 +91,5 @@ jobs:
           path: artifacts/packages/*.nupkg
 
       - name: Publish packages
-        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-        run: dotnet nuget push "artifacts/packages/*.nupkg" --source https://nuget.pkg.github.com/solster/index.json --api-key "${{ secrets.GITHUB_TOKEN }}" --skip-duplicate
+        if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))) || github.event_name == 'workflow_dispatch'
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key "${{ secrets.GITHUB_TOKEN }}" --skip-duplicate

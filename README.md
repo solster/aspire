@@ -10,6 +10,7 @@ All packages target `net10.0`.
 - `Solster.Aspire.Azure.FrontDoor`
 - `Solster.Aspire.Hosting.Azure.CommunicationServices`
 - `Solster.Aspire.Hosting.Azure.FrontDoor`
+- `Solster.Aspire.Hosting.Azure.PostgreSQL`
 
 ## Restore
 
@@ -40,3 +41,5 @@ dotnet pack Solster.Aspire.slnx --configuration Release --no-build --output arti
 `Solster.Aspire.Hosting.Azure.FrontDoor` adds Aspire AppHost extensions for Azure Front Door provisioning.
 
 `Solster.Aspire.Azure.FrontDoor` adds runtime Front Door configuration and middleware helpers for ASP.NET Core applications.
+
+`Solster.Aspire.Hosting.Azure.PostgreSQL` adds an Aspire deploy pipeline extension for applying EF Core migrations against Azure PostgreSQL using `DefaultAzureCredential`.

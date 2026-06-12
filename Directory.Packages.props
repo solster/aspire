@@ -14,5 +14,13 @@
     <PackageVersion Include="Azure.Provisioning.Communication" Version="1.0.0-beta.4" />
     <PackageVersion Include="Azure.Provisioning.Cdn" Version="1.0.0-beta.1" />
     <PackageVersion Include="Aspire.Hosting.Azure" Version="13.3.4" />
+    <PackageVersion Include="Aspire.Hosting.Azure.PostgreSQL" Version="13.3.4" />
+    <PackageVersion Include="MessagePack" Version="2.5.302" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
 </Project>
