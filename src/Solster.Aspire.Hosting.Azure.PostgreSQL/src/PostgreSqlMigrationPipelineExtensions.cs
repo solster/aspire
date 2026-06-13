@@ -13,8 +13,7 @@ public static class PostgreSqlMigrationPipelineExtensions
 {
     public static IResourceBuilder<AzurePostgresFlexibleServerDatabaseResource> WithMigration<TContext>(
         this IResourceBuilder<AzurePostgresFlexibleServerDatabaseResource> builder,
-        IResourceBuilder<AzureUserAssignedIdentityResource> identityBuilder,
-        bool useAccessTokenClaimsForUsername = false)
+        IResourceBuilder<AzureUserAssignedIdentityResource> identityBuilder)
         where TContext : DbContext
     {
         var stepName = $"migration-{builder.Resource.Name}";
@@ -50,23 +49,16 @@ public static class PostgreSqlMigrationPipelineExtensions
                         context.CancellationToken
                     );
 
-                    var user = await identityBuilder.Resource.PrincipalName.GetValueAsync(context.CancellationToken);
-
-                    // Local deploys can authenticate with an interactive user token. In that case,
-                    // 'upn' / 'preferred_username' carry the Azure PostgreSQL role name.
-                    if (useAccessTokenClaimsForUsername)
-                    {
-                        user = AccessTokenClaims.GetUsername(accessToken.Token);
-                    }
+                    var user = await identityBuilder.Resource.NameOutputReference.GetValueAsync(context.CancellationToken);
 
                     if (string.IsNullOrEmpty(user))
                     {
                         throw new InvalidOperationException(
                             "Could not determine the AAD principal name for the database connection. " +
-                            (useAccessTokenClaimsForUsername
-                                ? "JWT token contains neither 'upn' nor 'preferred_username'."
-                                : "The identity principal name is empty."));
+                            "The identity name is empty.");
                     }
+
+                    context.Logger.LogInformation("Using Azure PostgreSQL migration username from managed identity name: {user}", user);
 
                     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
                     {

@@ -3,3 +3,4 @@ obj/
 artifacts/
 *.nupkg
 *.snupkg
+/.idea
